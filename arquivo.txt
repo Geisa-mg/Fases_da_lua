@@ -1,0 +1,11 @@
+Computação Gráfica
+
+criar uma cena
+- cena, camera e renderização
+
+renderizar a imagem na tela 
+- adicionando figura geométrica
+- aplicando textura sobre a figura
+
+luz
+- pointLight: emite luz partindo de um unico ponto
