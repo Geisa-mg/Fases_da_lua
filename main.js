@@ -44,6 +44,7 @@ loader.load('models/cosmonaut.glb',
     }
 );
 
+//Making the sphere for the astronaut
 const astroGeometry = new THREE.SphereGeometry(3.3, 2, 3);
 const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: false, opacity: 0.0, wireframe: true });
 const astroSphere = new THREE.Mesh(astroGeometry, astroMaterial);
@@ -98,6 +99,9 @@ var vel = 0.11;
 var angle = 0;
 var travel = 0;
 var accel = getRandomArbitrary(0, 0.7);
+var posicaoX = 0;
+var posicaoY = -100;
+var posicaoZ = -1000;
 
 var animate = function () {
     requestAnimationFrame(animate);
@@ -115,6 +119,18 @@ var animate = function () {
         velY = -velY;
     }
 
+    //Making the astronaut spin
+    astronaut.rotation.x = travel + accel;
+    astroSphere.rotation.x = astronaut.rotation.x;
+
+    astronaut.rotation.y = travel + accel;
+    astroSphere.rotation.y = astronaut.rotation.y;
+
+    astronaut.rotation.z = travel + accel;
+    astroSphere.rotation.z = astronaut.rotation.z;
+
+    //astroSphere.position.x = posicaoX;
+
     renderer.render(scene, camera);
 }
 
@@ -128,6 +144,15 @@ document.onkeydown = function (event) {
     if (event.key == ' ') {
         travel += accel;
 
+        astronaut.position.x = accel;
+        astronaut.position.y = accel;
+        astronaut.position.z = -1000;
+
+
+        astroSphere.position.x = astronaut.position.x;
+        astroSphere.position.y = astronaut.position.y;
+        astroSphere.position.z = -1000;
+
         astronaut.rotation.x = accel;
         astronaut.rotation.y = accel;
         astronaut.rotation.z = accel;
@@ -135,13 +160,22 @@ document.onkeydown = function (event) {
         astroSphere.rotation.x = astronaut.rotation.x;
         astroSphere.rotation.y = astronaut.rotation.y;
         astroSphere.rotation.z = astronaut.rotation.z;
+
+        posicaoX = astronaut.position.x;
+        posicaoY = astronaut.position.y;
+        posicaoZ = astronaut.position.z;
+
+        astroSphere.position.x = posicaoX;
+        astroSphere.position.y = posicaoY;
+        astroSphere.position.z = posicaoZ;
+        
     }
 }
 
 document.onkeyup = function (event) {
     console.log(event);
     if (event.key == ' ') {
-        travel -= accel;
+        travel += accel;
     }
 }
 
