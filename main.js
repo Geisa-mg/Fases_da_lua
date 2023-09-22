@@ -44,6 +44,11 @@ loader.load('models/cosmonaut.glb',
     }
 );
 
+const astroGeometry = new THREE.SphereGeometry(3.3, 2, 3);
+const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: false, opacity: 0.0, wireframe: true });
+const astroSphere = new THREE.Mesh(astroGeometry, astroMaterial);
+scene.add(astroSphere);
+
 //Making the sky with stars
 class sky {
     limiteX = 20.0;
@@ -91,9 +96,12 @@ var limitX = 10.0;
 var limitY = 15.0;
 var vel = 0.11;
 var angle = 0;
+var travel = 0;
+var accel = getRandomArbitrary(0, 0.7);
 
-function animate() {
+var animate = function () {
     requestAnimationFrame(animate);
+
     //Starting the moon on the left
     moon.position.x = -15 * (Math.cos(angle));
     moon.position.y = 6 * Math.sin(angle);
@@ -110,8 +118,6 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-animate();
-
 //User interaction
 document.onkeydown = function (event) {
     console.log(event);
@@ -119,13 +125,24 @@ document.onkeydown = function (event) {
         angle += vel;
     }
 
-    if (event.key == " ") {
+    if (event.key == ' ') {
+        travel += accel;
+
+        astronaut.rotation.x = accel;
+        astronaut.rotation.y = accel;
+        astronaut.rotation.z = accel;
+    
+        astroSphere.rotation.x = astronaut.rotation.x;
+        astroSphere.rotation.y = astronaut.rotation.y;
+        astroSphere.rotation.z = astronaut.rotation.z;
     }
 }
 
 document.onkeyup = function (event) {
     console.log(event);
-    if (event.key == " ") {
-        
+    if (event.key == ' ') {
+        travel -= accel;
     }
 }
+
+animate();
