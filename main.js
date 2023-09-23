@@ -35,7 +35,9 @@ const loader = new GLTFLoader();
 loader.load('models/cosmonaut.glb',
     function (gltf) {
         astronaut = gltf.scene;
-        astronaut.position.set(0, -100, -1000);
+        console.log(astronaut.scale)
+        astronaut.scale.set(0.02, 0.02, 0.02);
+        //astronaut.position.set(0, -2, 0);
         scene.add(gltf.scene);
     },
     undefined,
@@ -45,7 +47,7 @@ loader.load('models/cosmonaut.glb',
 );
 
 //Making the sphere for the astronaut
-const astroGeometry = new THREE.SphereGeometry(3.3, 2, 3);
+const astroGeometry = new THREE.SphereGeometry(3, 7, 5);
 const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: false, opacity: 0.0, wireframe: true });
 const astroSphere = new THREE.Mesh(astroGeometry, astroMaterial);
 scene.add(astroSphere);
@@ -90,18 +92,22 @@ scene.add(pointLight);
 //Camera position
 camera.position.z = 20;
 
-//Variables
+//Moon variables
 var velX = 0.01;
 var velY = 0.07;
 var limitX = 10.0;
 var limitY = 15.0;
 var vel = 0.11;
 var angle = 0;
-var travel = 0;
-var accel = getRandomArbitrary(0, 0.7);
-var posicaoX = 0;
-var posicaoY = -100;
-var posicaoZ = -1000;
+
+//Astronaut variables
+var travel = 0.01;
+var accelX = 0.3
+var accelY = 0.2
+var accelZ = 0.1
+var limitAstroX = 11.0;
+var limitAstroY = 7.0;
+var limitAstroZ = 5.0;
 
 var animate = function () {
     requestAnimationFrame(animate);
@@ -120,17 +126,21 @@ var animate = function () {
     }
 
     //Making the astronaut spin
-    astronaut.rotation.x = travel + accel;
-    astroSphere.rotation.x = astronaut.rotation.x;
+    if (astronaut && astroSphere) {
+        astroSphere.position.x = astronaut.position.x;
+        astroSphere.position.y = astronaut.position.y;
+        astroSphere.position.z = astronaut.position.z;
 
-    astronaut.rotation.y = travel + accel;
-    astroSphere.rotation.y = astronaut.rotation.y;
-
-    astronaut.rotation.z = travel + accel;
-    astroSphere.rotation.z = astronaut.rotation.z;
-
-    //astroSphere.position.x = posicaoX;
-
+        if (astronaut.position.x > limitAstroX || astronaut.position.x < -limitAstroX) {
+            accelX = -accelX;
+        }
+        if (astronaut.position.y > limitAstroY || astronaut.position.y < -limitAstroY) {
+            accelY = -accelY;
+        }
+        if (astronaut.position.z > limitAstroZ || astronaut.position.z < -limitAstroZ) {
+            accelZ = -accelZ;
+        }
+    }
     renderer.render(scene, camera);
 }
 
@@ -142,40 +152,27 @@ document.onkeydown = function (event) {
     }
 
     if (event.key == ' ') {
-        travel += accel;
+        astronaut.position.x += accelX;
+        astronaut.position.y += accelY;
+        astronaut.position.z += accelZ;
 
-        astronaut.position.x = accel;
-        astronaut.position.y = accel;
-        astronaut.position.z = -1000;
-
-
-        astroSphere.position.x = astronaut.position.x;
-        astroSphere.position.y = astronaut.position.y;
-        astroSphere.position.z = -1000;
-
-        astronaut.rotation.x = accel;
-        astronaut.rotation.y = accel;
-        astronaut.rotation.z = accel;
-    
+        astronaut.rotation.x += travel;
         astroSphere.rotation.x = astronaut.rotation.x;
+
+        astronaut.rotation.y += travel;
         astroSphere.rotation.y = astronaut.rotation.y;
+
+        astronaut.rotation.z += travel;
         astroSphere.rotation.z = astronaut.rotation.z;
-
-        posicaoX = astronaut.position.x;
-        posicaoY = astronaut.position.y;
-        posicaoZ = astronaut.position.z;
-
-        astroSphere.position.x = posicaoX;
-        astroSphere.position.y = posicaoY;
-        astroSphere.position.z = posicaoZ;
-        
     }
 }
 
 document.onkeyup = function (event) {
     console.log(event);
     if (event.key == ' ') {
-        travel += accel;
+        astronaut.position.x = astronaut.position.x;
+        astronaut.position.y = astronaut.position.y;
+        astronaut.position.z = astronaut.position.z;
     }
 }
 
