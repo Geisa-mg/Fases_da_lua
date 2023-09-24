@@ -1,6 +1,23 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+//Moon variables
+var velX = 0.01;
+var velY = 0.07;
+var limitX = 10.0;
+var limitY = 15.0;
+var vel = 0.11;
+var angle = 0;
+
+//Astronaut variables
+var travel = 0.01;
+var accelX = 0.3
+var accelY = 0.2
+var accelZ = 0.1
+var limitAstroX = 11.0;
+var limitAstroY = 7.0;
+var limitAstroZ = 5.0;
+
 //Randoms
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
@@ -21,6 +38,8 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+//Audio
+
 //Creation of the moon and change of material
 const moonGeometry = new THREE.SphereGeometry(2, 60, 60);
 const moonTexture = new THREE.TextureLoader().load("images/moon_map.jpg");
@@ -35,9 +54,7 @@ const loader = new GLTFLoader();
 loader.load('models/cosmonaut.glb',
     function (gltf) {
         astronaut = gltf.scene;
-        console.log(astronaut.scale)
         astronaut.scale.set(0.02, 0.02, 0.02);
-        //astronaut.position.set(0, -2, 0);
         scene.add(gltf.scene);
     },
     undefined,
@@ -46,8 +63,8 @@ loader.load('models/cosmonaut.glb',
     }
 );
 
-//Making the sphere for the astronaut
-const astroGeometry = new THREE.SphereGeometry(3, 7, 5);
+//Making the sphere for the astronaut //3,7,3
+const astroGeometry = new THREE.SphereGeometry(5, 7, 5);
 const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: false, opacity: 0.0, wireframe: true });
 const astroSphere = new THREE.Mesh(astroGeometry, astroMaterial);
 scene.add(astroSphere);
@@ -89,25 +106,26 @@ const pointLight = new THREE.PointLight(0xffffff, 10000, 10000);
 pointLight.position.set(150, 100, -900);
 scene.add(pointLight);
 
+//Collision
+function foiAtingido() {
+    var deltaX = moon.position.x - astroSphere.position.x;
+    console.log(deltaX);
+    var deltaY = moon.position.y - astroSphere.position.y;
+    var deltaZ = moon.position.z - astroSphere.position.z;
+    var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+    if (moon.position.x < astroSphere.position.x || moon.position.x < astroSphere.position.x) {
+        return false;
+    } else if (moon.position.y < astroSphere.position.y || moon.position.y < astroSphere.position.y) {
+        return false;
+    } else if (moon.position.z < astroSphere.position.z || moon.position.z < astroSphere.position.z) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 //Camera position
 camera.position.z = 20;
-
-//Moon variables
-var velX = 0.01;
-var velY = 0.07;
-var limitX = 10.0;
-var limitY = 15.0;
-var vel = 0.11;
-var angle = 0;
-
-//Astronaut variables
-var travel = 0.01;
-var accelX = 0.3
-var accelY = 0.2
-var accelZ = 0.1
-var limitAstroX = 11.0;
-var limitAstroY = 7.0;
-var limitAstroZ = 5.0;
 
 var animate = function () {
     requestAnimationFrame(animate);
@@ -120,7 +138,6 @@ var animate = function () {
     if (moon.position.x > limitX || moon.position.x < -limitX) {
         velX = -velX;
     }
-
     if (moon.position.y > limitY || moon.position.y < -limitY) {
         velY = -velY;
     }
@@ -141,12 +158,12 @@ var animate = function () {
             accelZ = -accelZ;
         }
     }
+
     renderer.render(scene, camera);
 }
 
 //User interaction
 document.onkeydown = function (event) {
-    console.log(event);
     if (event.key == "ArrowRight") {
         angle += vel;
     }
@@ -157,18 +174,21 @@ document.onkeydown = function (event) {
         astronaut.position.z += accelZ;
 
         astronaut.rotation.x += travel;
-        astroSphere.rotation.x = astronaut.rotation.x;
-
         astronaut.rotation.y += travel;
-        astroSphere.rotation.y = astronaut.rotation.y;
-
         astronaut.rotation.z += travel;
+
+        astroSphere.rotation.x = astronaut.rotation.x;
+        astroSphere.rotation.y = astronaut.rotation.y;
         astroSphere.rotation.z = astronaut.rotation.z;
+    }
+
+    if (astroSphere != null && foiAtingido()) {
+        //moon.position.set(0, 0, 0);
+        console.log("Foi atingido, iei")
     }
 }
 
 document.onkeyup = function (event) {
-    console.log(event);
     if (event.key == ' ') {
         astronaut.position.x = astronaut.position.x;
         astronaut.position.y = astronaut.position.y;
