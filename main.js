@@ -39,6 +39,28 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 //Audio
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+const sound = new THREE.Audio(listener);
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('sounds/universe.ogg', function (buffer) {
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(0.2);
+    sound.play();
+});
+
+const listener2 = new THREE.AudioListener();
+camera.add(listener2);
+
+const soundCollision = new THREE.Audio(listener);
+const audioLoaderCollision = new THREE.AudioLoader();
+audioLoaderCollision.load('sounds/bomb.mp3', function (buffer) {
+    soundCollision.setBuffer(buffer);
+    soundCollision.setLoop(false);
+    soundCollision.setVolume(0.6);
+});
 
 //Creation of the moon and change of material
 const moonGeometry = new THREE.SphereGeometry(2, 60, 60);
@@ -63,9 +85,25 @@ loader.load('models/cosmonaut.glb',
     }
 );
 
-//Making the sphere for the astronaut //3,7,3
-const astroGeometry = new THREE.SphereGeometry(5, 7, 5);
-const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: false, opacity: 0.0, wireframe: true });
+//Creation of the explosion 3D model
+var collision;
+const loader2 = new GLTFLoader();
+loader2.load('models/collision.glb',
+    function (gltf) {
+        collision = gltf.scene;
+        collision.scale.set(30, 30, 30)
+        scene.add(gltf.scene);
+        collision.visible = false;
+    },
+    undefined,
+    function (error) {
+        console.error(error);
+    }
+);
+
+//Making the sphere for the astronaut 
+const astroGeometry = new THREE.SphereGeometry(3, 7, 3);
+const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.0 });
 const astroSphere = new THREE.Mesh(astroGeometry, astroMaterial);
 scene.add(astroSphere);
 
@@ -102,26 +140,19 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
 directionalLight.position.set(-1, 0, 0);
 scene.add(directionalLight);
 
-const pointLight = new THREE.PointLight(0xffffff, 10000, 10000);
-pointLight.position.set(150, 100, -900);
+const ambientLight = new THREE.AmbientLight(0x0000ff, 0.03);
+scene.add(ambientLight);
+
+const pointLight = new THREE.PointLight(0x0000ff, 1000, 5);
 scene.add(pointLight);
 
 //Collision
 function foiAtingido() {
     var deltaX = moon.position.x - astroSphere.position.x;
-    console.log(deltaX);
     var deltaY = moon.position.y - astroSphere.position.y;
     var deltaZ = moon.position.z - astroSphere.position.z;
     var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-    if (moon.position.x < astroSphere.position.x || moon.position.x < astroSphere.position.x) {
-        return false;
-    } else if (moon.position.y < astroSphere.position.y || moon.position.y < astroSphere.position.y) {
-        return false;
-    } else if (moon.position.z < astroSphere.position.z || moon.position.z < astroSphere.position.z) {
-        return false;
-    } else {
-        return true;
-    }
+    return dist < 5;
 }
 
 //Camera position
@@ -129,6 +160,17 @@ camera.position.z = 20;
 
 var animate = function () {
     requestAnimationFrame(animate);
+
+    //Creating a gravity
+    if (astronaut) {
+        astronaut.position.x += 0.001;
+        astronaut.position.y += 0.001;
+        astronaut.position.z += 0.001;
+
+        astronaut.rotation.x += 0.001;
+        astronaut.rotation.y += 0.001;
+        astronaut.rotation.z += 0.001;
+    }
 
     //Starting the moon on the left
     moon.position.x = -15 * (Math.cos(angle));
@@ -159,6 +201,17 @@ var animate = function () {
         }
     }
 
+    if (astroSphere != null && foiAtingido()) {
+        moon.visible = false;
+        collision.visible = true;
+        astronaut.visible = false;
+        astroSphere.visible = false;
+        collision.position.set(moon.position.x, moon.position.y, moon.position.z);
+        soundCollision.play(true);
+    }
+
+    pointLight.position.set(astroSphere.position.x, astroSphere.position.y, astroSphere.position.z);
+
     renderer.render(scene, camera);
 }
 
@@ -180,11 +233,6 @@ document.onkeydown = function (event) {
         astroSphere.rotation.x = astronaut.rotation.x;
         astroSphere.rotation.y = astronaut.rotation.y;
         astroSphere.rotation.z = astronaut.rotation.z;
-    }
-
-    if (astroSphere != null && foiAtingido()) {
-        //moon.position.set(0, 0, 0);
-        console.log("Foi atingido, iei")
     }
 }
 
