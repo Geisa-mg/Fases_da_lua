@@ -42,6 +42,7 @@ document.body.appendChild(renderer.domElement);
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
+//Sound of the universe
 const sound = new THREE.Audio(listener);
 const audioLoader = new THREE.AudioLoader();
 audioLoader.load('sounds/universe.ogg', function (buffer) {
@@ -51,15 +52,14 @@ audioLoader.load('sounds/universe.ogg', function (buffer) {
     sound.play();
 });
 
-const listener2 = new THREE.AudioListener();
-camera.add(listener2);
+const listenerCollision = new THREE.AudioListener();
+camera.add(listenerCollision);
 
+//Sound when collision happens
 const soundCollision = new THREE.Audio(listener);
 const audioLoaderCollision = new THREE.AudioLoader();
-audioLoaderCollision.load('sounds/bomb.mp3', function (buffer) {
-    soundCollision.setBuffer(buffer);
-    soundCollision.setLoop(false);
-    soundCollision.setVolume(0.6);
+audioLoaderCollision.load('sounds/bomb.mp3', function (bufferCollision) {
+    soundCollision.setBuffer(bufferCollision);
 });
 
 //Creation of the moon and change of material
@@ -73,14 +73,12 @@ scene.add(moon);
 //Creation of the astronaut 3D model
 var astronaut;
 const loader = new GLTFLoader();
-loader.load('models/cosmonaut.glb',
-    function (gltf) {
+loader.load('models/cosmonaut.glb', function (gltf) {
         astronaut = gltf.scene;
         astronaut.scale.set(0.02, 0.02, 0.02);
         scene.add(gltf.scene);
     },
-    undefined,
-    function (error) {
+    undefined, function (error) {
         console.error(error);
     }
 );
@@ -88,15 +86,13 @@ loader.load('models/cosmonaut.glb',
 //Creation of the explosion 3D model
 var collision;
 const loader2 = new GLTFLoader();
-loader2.load('models/collision.glb',
-    function (gltf) {
+loader2.load('models/collision.glb', function (gltf) {
         collision = gltf.scene;
         collision.scale.set(30, 30, 30)
         scene.add(gltf.scene);
         collision.visible = false;
     },
-    undefined,
-    function (error) {
+    undefined, function (error) {
         console.error(error);
     }
 );
@@ -140,11 +136,11 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
 directionalLight.position.set(-1, 0, 0);
 scene.add(directionalLight);
 
-const ambientLight = new THREE.AmbientLight(0x0000ff, 0.03);
-scene.add(ambientLight);
-
 const pointLight = new THREE.PointLight(0x0000ff, 1000, 5);
 scene.add(pointLight);
+
+const ambientLight = new THREE.AmbientLight(0x0000ff, 0.03);
+scene.add(ambientLight);
 
 //Collision
 function foiAtingido() {
@@ -161,15 +157,18 @@ camera.position.z = 20;
 var animate = function () {
     requestAnimationFrame(animate);
 
+    //Light on the astronaut
+    pointLight.position.set(astroSphere.position.x, astroSphere.position.y, astroSphere.position.z);
+
     //Creating a gravity
     if (astronaut) {
-        astronaut.position.x += 0.001;
-        astronaut.position.y += 0.001;
-        astronaut.position.z += 0.001;
+        astronaut.position.x += 0.003;
+        astronaut.position.y += 0.003;
+        astronaut.position.z += 0.003;
 
-        astronaut.rotation.x += 0.001;
-        astronaut.rotation.y += 0.001;
-        astronaut.rotation.z += 0.001;
+        astronaut.rotation.x += 0.003;
+        astronaut.rotation.y += 0.003;
+        astronaut.rotation.z += 0.003;
     }
 
     //Starting the moon on the left
@@ -201,16 +200,18 @@ var animate = function () {
         }
     }
 
+    //Events when collision is detected
     if (astroSphere != null && foiAtingido()) {
+        soundCollision.setVolume(1.5);
+        soundCollision.play(true);
         moon.visible = false;
         collision.visible = true;
         astronaut.visible = false;
-        astroSphere.visible = false;
         collision.position.set(moon.position.x, moon.position.y, moon.position.z);
-        soundCollision.play(true);
+        setTimeout(() => {
+            soundCollision.pause();
+        }, "3500");
     }
-
-    pointLight.position.set(astroSphere.position.x, astroSphere.position.y, astroSphere.position.z);
 
     renderer.render(scene, camera);
 }
@@ -222,25 +223,29 @@ document.onkeydown = function (event) {
     }
 
     if (event.key == ' ') {
-        astronaut.position.x += accelX;
-        astronaut.position.y += accelY;
-        astronaut.position.z += accelZ;
+        if (astronaut && astroSphere) {
+            astronaut.position.x += accelX;
+            astronaut.position.y += accelY;
+            astronaut.position.z += accelZ;
 
-        astronaut.rotation.x += travel;
-        astronaut.rotation.y += travel;
-        astronaut.rotation.z += travel;
+            astronaut.rotation.x += travel;
+            astronaut.rotation.y += travel;
+            astronaut.rotation.z += travel;
 
-        astroSphere.rotation.x = astronaut.rotation.x;
-        astroSphere.rotation.y = astronaut.rotation.y;
-        astroSphere.rotation.z = astronaut.rotation.z;
+            astroSphere.rotation.x = astronaut.rotation.x;
+            astroSphere.rotation.y = astronaut.rotation.y;
+            astroSphere.rotation.z = astronaut.rotation.z;
+        }
     }
 }
 
 document.onkeyup = function (event) {
     if (event.key == ' ') {
-        astronaut.position.x = astronaut.position.x;
-        astronaut.position.y = astronaut.position.y;
-        astronaut.position.z = astronaut.position.z;
+        if (astronaut) {
+            astronaut.position.x = astronaut.position.x;
+            astronaut.position.y = astronaut.position.y;
+            astronaut.position.z = astronaut.position.z;
+        }
     }
 }
 
