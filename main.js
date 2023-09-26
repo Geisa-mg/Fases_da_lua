@@ -74,10 +74,10 @@ scene.add(moon);
 var astronaut;
 const loader = new GLTFLoader();
 loader.load('models/cosmonaut.glb', function (gltf) {
-        astronaut = gltf.scene;
-        astronaut.scale.set(0.02, 0.02, 0.02);
-        scene.add(gltf.scene);
-    },
+    astronaut = gltf.scene;
+    astronaut.scale.set(0.02, 0.02, 0.02);
+    scene.add(gltf.scene);
+},
     undefined, function (error) {
         console.error(error);
     }
@@ -87,11 +87,11 @@ loader.load('models/cosmonaut.glb', function (gltf) {
 var collision;
 const loader2 = new GLTFLoader();
 loader2.load('models/collision.glb', function (gltf) {
-        collision = gltf.scene;
-        collision.scale.set(30, 30, 30)
-        scene.add(gltf.scene);
-        collision.visible = false;
-    },
+    collision = gltf.scene;
+    collision.scale.set(30, 30, 30)
+    scene.add(gltf.scene);
+    collision.visible = false;
+},
     undefined, function (error) {
         console.error(error);
     }
