@@ -211,6 +211,18 @@ var animate = function () {
         setTimeout(() => {
             soundCollision.pause();
         }, "3500");
+
+        const button = document.querySelector("button");
+        const modal = document.querySelector("dialog");
+        const buttonClose = document.querySelector("dialog button");
+
+        button.onclick = function() {
+            modal.showModal()
+        }
+
+        buttonClose.onclick = function() {
+            modal.close()
+        }
     }
 
     renderer.render(scene, camera);
