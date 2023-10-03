@@ -151,6 +151,20 @@ function foiAtingido() {
     return dist < 5;
 }
 
+//Popup
+const modal = document.querySelector("dialog");
+const buttonClose = document.querySelector("dialog button");
+
+function openPopup() {
+    modal.showModal();
+}
+
+function closePopup() {
+    buttonClose.onclick = function () {
+        modal.close();
+    }
+}
+
 //Camera position
 camera.position.z = 20;
 
@@ -212,18 +226,10 @@ var animate = function () {
             soundCollision.pause();
         }, "3500");
 
-        const button = document.querySelector("button");
-        const modal = document.querySelector("dialog");
-        const buttonClose = document.querySelector("dialog button");
-
-        button.onclick = function() {
-            modal.showModal()
-        }
-
-        buttonClose.onclick = function() {
-            modal.close()
-        }
+        openPopup();
     }
+
+    closePopup();
 
     renderer.render(scene, camera);
 }
