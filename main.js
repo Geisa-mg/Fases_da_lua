@@ -27,6 +27,19 @@ function getRandomColor() {
     return '#' + parseInt((Math.random() * 0xFFFFFF)).toString(16).padStart(6, '0');
 }
 
+//Popup
+const modal = document.querySelector("dialog");
+
+function openPopup() {
+    modal.showModal();
+}
+
+//Change of scene
+function change() {
+    modal.close();
+    window.location.href = "index2.html"
+}
+
 //Scene
 const scene = new THREE.Scene();
 
@@ -151,20 +164,6 @@ function foiAtingido() {
     return dist < 5;
 }
 
-//Popup
-const modal = document.querySelector("dialog");
-const buttonClose = document.querySelector("dialog button");
-
-function openPopup() {
-    modal.showModal();
-}
-
-function closePopup() {
-    buttonClose.onclick = function () {
-        modal.close();
-    }
-}
-
 //Camera position
 camera.position.z = 20;
 
@@ -227,9 +226,8 @@ var animate = function () {
         }, "3500");
 
         openPopup();
-    }
 
-    closePopup();
+    }
 
     renderer.render(scene, camera);
 }
@@ -266,5 +264,7 @@ document.onkeyup = function (event) {
         }
     }
 }
+
+document.getElementById("button").onclick = function () { change() }
 
 animate();
