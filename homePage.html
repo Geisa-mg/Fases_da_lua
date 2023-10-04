@@ -1,24 +1,95 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset=UTF-8 />
-    <title>Projeto Geísa e Lívia</title>
-    <link rel="shortcut icon" href="favicon_io/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" type="text/css" href="styles.css" />
-    <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet"> 
-  </head>
 
-  <body>
-    <div class="text-box">
-      <div class="heading">FASES DA LUA</div>
-      <div class="text">Projeto Geísa e Lívia - Computação Gráfica</div>
-      <div class="button-wrapper">
-        <a href="index.html"><div class="button">INICIAR JOGO</div></a>
-          <a href="https://github.com/Geisa-mg/Fases_da_lua" target="_blank" rel="noopener noreferrer"><div class="button">CÓDIGO FONTE</div></a>
-      </div>
+<head>
+  <meta charset=UTF-8 />
+  <title>Computer Graphics Project</title>
+  <link rel="shortcut icon" href="favicon_io/favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="text-box">
+    <div class="heading">MOON PHASES</div>
+    <div class="text">Geísa and Lívia computer graphics project</div>
+    <div class="button-wrapper">
+      <a href="phase1.html">
+        <div class="button">Start Game</div>
+      </a>
+      <a href="https://github.com/Geisa-mg/Fases_da_lua" target="_blank" rel="noopener noreferrer">
+        <div class="button">Source Code</div>
+      </a>
     </div>
+  </div>
 
-    <script src="three.min.js"></script>
-    <script src="mainHomePage.js"></script>
-  </body>
+  <script src="js/three.min.js"></script>
+  <script src="js/mainHomePage.js"></script>
+
+  <style>
+    body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      background: black;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    /* Game presentation */
+    .text-box {
+      font-size: 60px;
+      font-family: 'Raleway', sans-serif;
+      letter-spacing: 7px;
+      word-spacing: 12px;
+      text-transform: uppercase;
+      color: rgb(238, 238, 238);
+    }
+
+    .text {
+      font-size: 10px;
+      font-family: 'Raleway', sans-serif;
+      letter-spacing: 5px;
+      word-spacing: 10px;
+      text-transform: uppercase;
+      color: rgb(238, 238, 238);
+    }
+
+    .button-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      flex-direction: row;
+    }
+
+    .button {
+      display: inline-block;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 15px;
+      margin-left: 20px;
+      margin-right: 20px;
+      word-spacing: normal;
+      letter-spacing: 5px;
+      border: 1px solid white;
+      background: black;
+      cursor: pointer;
+      flex-direction: row;
+    }
+
+    a:hover {
+      color: rgb(238, 238, 238);
+    }
+  </style>
+</body>
+
 </html>
