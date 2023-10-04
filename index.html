@@ -7,13 +7,6 @@
 
   <link rel="shortcut icon" href="favicon_io/favicon.ico" type="image/x-icon">
 
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-  </style>
-
   <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
   <script type="importmap">
@@ -30,10 +23,55 @@
   <script type="module" src="/main.js"></script>
 
   <dialog>
-    <h2>Next level</h2>
-    <button id="button">Ok</button>
+    <h2>NEXT LEVEL</h2>
+    <button id="button">OK</button>
   </dialog>
 
 </body>
+
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+
+  /* Pop-Up */
+  dialog {
+    border: 3px solid black;
+    border-radius: 5px;
+    background: white;
+    box-shadow: 8px 8px 0 rgb(57, 57, 68);
+  }
+
+  /* Texto do pop-up */
+  h2 {
+    font-family: 'Raleway', sans-serif;
+    letter-spacing: 5px;
+    word-spacing: 10px;
+    text-transform: uppercase;
+    color: black;
+
+  }
+
+  #button {
+    font-family: 'Raleway', sans-serif;
+    background: white;
+    padding: 0.3rem 45%;
+    border: 3px solid rgb(57, 57, 68);
+    box-shadow: 0 0 0 rgb(57, 57, 68);
+    transition: all 0.2s;
+  }
+
+  #button:hover {
+    box-shadow: 0.4rem 0.4rem 0 rgb(57, 57, 68);
+    transform: translate(-0.4rem, -0.4rem);
+  }
+
+  #button:active{
+    box-shadow: 0 0 0 rgb(57, 57, 68);
+    transform: translate(0, 0);
+  }   
+
+</style>
 
 </html>

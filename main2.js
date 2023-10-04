@@ -2,13 +2,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 //Astronaut variables
-var travel = 0.01;
 var accelX = 0.3
 var accelY = 0.2
-var accelZ = 0.1
-var limitAstroX = 11.0;
-var limitAstroY = 7.0;
-var limitAstroZ = 5.0;
+var limitAstroX = 18.0;
+var limitAstroY = 9.0;
 
 //Randoms
 function getRandomArbitrary(min, max) {
@@ -157,13 +154,13 @@ var animate = function () {
 
     //Creating a gravity
     if (astronaut) {
-        astronaut.position.x += 0.003;
-        astronaut.position.y += 0.003;
-        astronaut.position.z += 0.003;
+        astronaut.position.x += 0.001;
+        astronaut.position.y += 0.001;
+        astronaut.position.z += 0.001;
 
-        astronaut.rotation.x += 0.003;
-        astronaut.rotation.y += 0.003;
-        astronaut.rotation.z += 0.003;
+        astronaut.rotation.x += 0.001;
+        astronaut.rotation.y += 0.001;
+        astronaut.rotation.z += 0.001;
     }
 
     //Making the astronaut spin
@@ -173,13 +170,18 @@ var animate = function () {
         astroSphere.position.z = astronaut.position.z;
 
         if (astronaut.position.x > limitAstroX || astronaut.position.x < -limitAstroX) {
-            accelX = -accelX;
+            if(astronaut.position.x > 0){
+                astronaut.position.x = astronaut.position.x - 1.5;
+            } else {
+                astronaut.position.x = astronaut.position.x + 1.5;
+            }
         }
         if (astronaut.position.y > limitAstroY || astronaut.position.y < -limitAstroY) {
-            accelY = -accelY;
-        }
-        if (astronaut.position.z > limitAstroZ || astronaut.position.z < -limitAstroZ) {
-            accelZ = -accelZ;
+            if(astronaut.position.y > 0){
+                astronaut.position.y = astronaut.position.y - 1.5;
+            } else {
+                astronaut.position.y = astronaut.position.y + 1.5;
+            }
         }
     }
     renderer.render(scene, camera);
