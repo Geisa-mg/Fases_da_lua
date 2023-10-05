@@ -6,6 +6,8 @@ var accelX = 0.3;
 var accelY = 0.2;
 var limitAstroX = 32.0;
 var limitAstroY = 12.0;
+var velX = 0;
+var velY = 0;
 
 //Randoms
 function getRandomArbitrary(min, max) {

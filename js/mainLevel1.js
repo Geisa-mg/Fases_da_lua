@@ -18,15 +18,6 @@ var limitAstroX = 11.0;
 var limitAstroY = 7.0;
 var limitAstroZ = 5.0;
 
-//Randoms
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
-}
-
-function getRandomColor() {
-    return '#' + parseInt((Math.random() * 0xFFFFFF)).toString(16).padStart(6, '0');
-}
-
 //Popup
 const modal = document.querySelector("dialog");
 
@@ -117,32 +108,28 @@ const astroSphere = new THREE.Mesh(astroGeometry, astroMaterial);
 scene.add(astroSphere);
 
 //Making the sky with stars
-class sky {
-    limiteX = 20.0;
-    limiteY = 10.0;
-    limiteZ = 1.0;
-    constructor(stars) {
-        this.stars = stars;
+const quantStars = [];
+let n = 100;
+let m = 100;
 
-        //Appear randomly
-        this.stars.position.x = getRandomArbitrary(-this.limiteX, this.limiteX);
-        this.stars.position.y = getRandomArbitrary(-this.limiteY, this.limiteY);
-        this.stars.position.z = getRandomArbitrary(-this.limiteZ, this.limiteZ);
+for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n; j++) {
+        let s = i / (m - 15.0);
+        let t = j / (n - 15.0);
+
+        let x = (Math.random()*100) * s - 50.0;
+        let y = (Math.random()*200) * t - 20.0;
+        let z = -5;
+
+        quantStars.push(new THREE.Vector3(x, y, z));
     }
 }
 
-//Creation the stars
-var quantStars = [];
-for (var i = 0; i < 100; i++) {
-    const starGeometry = new THREE.OctahedronGeometry(0.1, 0);
-    var paint = getRandomColor();
-    const starMaterial = new THREE.MeshStandardMaterial({ color: paint, wireframe: false });
-    const star = new THREE.Mesh(starGeometry, starMaterial);
-    scene.add(star);
+const geometry = new THREE.BufferGeometry().setFromPoints(quantStars);
+const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const stars = new THREE.Points(geometry, material);
 
-    const stars = new sky(star);
-    quantStars.push(stars)
-}
+scene.add(stars);
 
 //Lights
 const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
@@ -169,6 +156,10 @@ camera.position.z = 20;
 
 var animate = function () {
     requestAnimationFrame(animate);
+    //Rotação das estrelas
+    //geometry.rotateX(0.001);
+    //geometry.rotateY(0.001);
+    geometry.rotateZ(0.001);
 
     //Light on the astronaut
     pointLight.position.set(astroSphere.position.x, astroSphere.position.y, astroSphere.position.z);

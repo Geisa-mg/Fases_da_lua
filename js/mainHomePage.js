@@ -14,6 +14,7 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+//Making the sky with stars animation
 starGeometry = new THREE.Geometry();
 for (let i = 0; i < 6000; i++) {
     star = new THREE.Vector3(
@@ -26,17 +27,18 @@ for (let i = 0; i < 6000; i++) {
         starGeometry.vertices.push(star);
 }
 
-let sprite = new THREE.TextureLoader().load('images/star.png');
+let starTexture = new THREE.TextureLoader().load('images/star.png');
 let starMaterial = new THREE.PointsMaterial({
     color: 0xaaaaaa,
     size: 0.7,
-    map: sprite
+    map: starTexture
 });
 
 stars = new THREE.Points(starGeometry, starMaterial);
 scene.add(stars);
 
 function animate() {
+    //Making the animation of the stars "arrive" on the screen
     starGeometry.vertices.forEach(starPoint => {
         starPoint.vel += starPoint.accel;
         starPoint.y -= starPoint.vel;
@@ -45,8 +47,10 @@ function animate() {
             starPoint.vel = 0;
         }
     });
+
     starGeometry.verticesNeedUpdate = true;
     stars.rotation.y += 0.002;
+
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
