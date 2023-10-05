@@ -156,7 +156,7 @@ const ambientLight = new THREE.AmbientLight(0x0000ff, 0.03);
 scene.add(ambientLight);
 
 //Collision
-function foiAtingido() {
+function hitTarget() {
     var deltaX = moon.position.x - astroSphere.position.x;
     var deltaY = moon.position.y - astroSphere.position.y;
     var deltaZ = moon.position.z - astroSphere.position.z;
@@ -214,7 +214,7 @@ var animate = function () {
     }
 
     //Events when collision is detected
-    if (astroSphere != null && foiAtingido()) {
+    if (astroSphere != null && hitTarget()) {
         soundCollision.setVolume(1.5);
         soundCollision.play(true);
         moon.visible = false;

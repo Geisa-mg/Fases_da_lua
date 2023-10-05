@@ -2,10 +2,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 //Astronaut variables
-var accelX = 0.3
-var accelY = 0.2
-var limitAstroX = 18.0;
-var limitAstroY = 9.0;
+var accelX = 0.3;
+var accelY = 0.2;
+var limitAstroX = 32.0;
+var limitAstroY = 12.0;
 
 //Randoms
 function getRandomArbitrary(min, max) {
@@ -14,6 +14,27 @@ function getRandomArbitrary(min, max) {
 
 function getRandomColor() {
     return '#' + parseInt((Math.random() * 0xFFFFFF)).toString(16).padStart(6, '0');
+}
+
+function getRandomImages() {
+    return parseInt((Math.random() * 3) + 1);
+}
+
+//Popup
+const modal = document.querySelector("dialog");
+
+function openPopup() {
+    modal.showModal();
+}
+
+//Change of scene
+function change() {
+    if(document.getElementById("playAgain").onclick){
+        window.location.href = "homePage.html"
+    } else {
+        //NECESSITA DE VERIFICAÇÃO (tratar depois)
+        modal.close();
+    }
 }
 
 //Scene
@@ -27,11 +48,36 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+//Audio
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+//Sound of the universe
+const sound = new THREE.Audio(listener);
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('sounds/universe.ogg', function (buffer) {
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(0.2);
+    sound.play();
+});
+
+const listenerCollision = new THREE.AudioListener();
+camera.add(listenerCollision);
+
+//Sound when collision happens
+const soundCollision = new THREE.Audio(listener);
+const audioLoaderCollision = new THREE.AudioLoader();
+audioLoaderCollision.load('sounds/bomb.mp3', function (bufferCollision) {
+    soundCollision.setBuffer(bufferCollision);
+});
+
 //Creation of the astronaut 3D model
 var astronaut;
 const loader = new GLTFLoader();
 loader.load('models/cosmonaut.glb', function (gltf) {
     astronaut = gltf.scene;
+    astronaut.position.z = -20
     astronaut.scale.set(0.02, 0.02, 0.02);
     scene.add(gltf.scene);
 },
@@ -40,24 +86,38 @@ loader.load('models/cosmonaut.glb', function (gltf) {
     }
 );
 
+//Creation of the explosion 3D model
+var collision;
+const loader2 = new GLTFLoader();
+loader2.load('models/collision.glb', function (gltf) {
+    collision = gltf.scene;
+    collision.scale.set(30, 30, 30)
+    scene.add(gltf.scene);
+    collision.visible = false;
+},
+    undefined, function (error) {
+        console.error(error);
+    }
+);
+
 //Making the sphere for the astronaut 
 const astroGeometry = new THREE.SphereGeometry(3, 7, 3);
-const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.0 });
+const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: false, opacity: 0.0, wireframe: true });
 const astroSphere = new THREE.Mesh(astroGeometry, astroMaterial);
 scene.add(astroSphere);
 
 //Making the sky with stars
 class sky {
-    limiteX = 20.0;
-    limiteY = 10.0;
-    limiteZ = 1.0;
+    limitX = 32.0;
+    limitY = 12.0;
+    limitZ = 1.0;
     constructor(stars) {
         this.stars = stars;
 
         //Appear randomly
-        this.stars.position.x = getRandomArbitrary(-this.limiteX, this.limiteX);
-        this.stars.position.y = getRandomArbitrary(-this.limiteY, this.limiteY);
-        this.stars.position.z = getRandomArbitrary(-this.limiteZ, this.limiteZ);
+        this.stars.position.x = getRandomArbitrary(-this.limitX, this.limitX);
+        this.stars.position.y = getRandomArbitrary(-this.limitY, this.limitY);
+        this.stars.position.z = getRandomArbitrary(-this.limitZ, this.limitZ);
     }
 }
 
@@ -75,76 +135,108 @@ for (var i = 0; i < 100; i++) {
 }
 
 //Creation the moons
-class simulavel {
-    limiteX = 6;
-    limiteY = 5;
-    limiteZ = 10;
-    constructor(geometria, velZ) {
-        this.geometria = geometria;
+class simulable {
+    limitX = 20;
+    limitY = 10;
+    limitZ = 1;
+    constructor(moonFigures, velZ) {
+        this.moonFigures = moonFigures;
         this.velX = 0;
         this.velY = 0;
         this.velZ = velZ;
         this.rotX = getRandomArbitrary(0.01, 0.02);
         this.rotY = getRandomArbitrary(0.01, 0.02);
         this.rotZ = getRandomArbitrary(0.01, 0.02);
-        this.geometria.position.x = getRandomArbitrary(-this.limiteX, this.limiteX);
-        this.geometria.position.y = getRandomArbitrary(-this.limiteY, this.limiteY);
-        this.geometria.position.z = -this.limiteZ;
+        this.moonFigures.position.x = getRandomArbitrary(-this.limitX, this.limitX);
+        this.moonFigures.position.y = getRandomArbitrary(-this.limitY, this.limitY);
+        this.moonFigures.position.z = -this.limitZ;
     }
 
     simule() {
-        this.geometria.rotation.x += this.rotX;
-        this.geometria.rotation.y += this.rotY;
-        this.geometria.rotation.z += this.rotZ;
-        this.geometria.position.x += this.velX;
-        this.geometria.position.y += this.velY;
-        this.geometria.position.z += this.velZ;
+        this.moonFigures.rotation.x += this.rotX;
+        this.moonFigures.rotation.y += this.rotY;
+        this.moonFigures.rotation.z += this.rotZ;
+        this.moonFigures.position.x += this.velX;
+        this.moonFigures.position.y += this.velY;
+        this.moonFigures.position.z -= this.velZ;
 
-        if (this.geometria.position.x > this.limiteX || this.geometria.position.x < -this.limiteX)
-            this.geometria.visible = false;
-        if (this.geometria.position.y > this.limiteY || this.geometria.position.y < -this.limiteY)
-            this.geometria.visible = false;
-        if (this.geometria.position.z > this.limiteZ)
-            this.geometria.visible = false;
+
+        //Events when collision is detected
+        if (astroSphere != null && this.hitTarget()) {
+            soundCollision.setVolume(1.5);
+            soundCollision.play(true);
+            //moonSphere.visible = false;
+            collision.visible = true;
+            astronaut.visible = false;
+            collision.position.set(astronaut.position.x, astronaut.position.y, astronaut.position.z);
+            setTimeout(() => {
+                soundCollision.pause();
+            }, "3500");
+
+            openPopup();
+
+        }
+    }
+
+    hitTarget() {
+        var deltaX = this.moonFigures.position.x - astroSphere.position.x;
+        var deltaY = this.moonFigures.position.y - astroSphere.position.y;
+        var deltaZ = this.moonFigures.position.z - astroSphere.position.z;
+        var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+        return dist < 2;
+        // var med = insert / 27
+        // if(dist <= med){
+        //     console.log(med)
+        //     return med
+        // } else {
+        //     console.log(1)
+        //     return 1
+        // }
+
+        //return dist < med;
     }
 }
 
 var objetos = [];
+var quantRadius = [];
 
-for (var i = 0; i < 14; i++) {
-    const geometry = new THREE.SphereGeometry(1, 60, 60);
-    const moonTexture = new THREE.TextureLoader().load("../images/moon4.jpg");
+for (var i = 0; i < 27; i++) {
+    const geometry = new THREE.SphereGeometry(getRandomArbitrary(0.1, 1), 60, 60);
+    const moonTexture = new THREE.TextureLoader().load("../images/moon" + getRandomImages() + ".jpg");
     const material = new THREE.MeshBasicMaterial();
     material.map = moonTexture;
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+    const moonSphere = new THREE.Mesh(geometry, material);
+    scene.add(moonSphere);
 
-    const obj1 = new simulavel(cube, getRandomArbitrary(0.01, 0.05));
-    objetos.push(obj1)
+    var rad = moonSphere.geometry.parameters.radius;
+    quantRadius.push(rad);
+    console.log(rad);
+
+    const obj1 = new simulable(moonSphere, getRandomArbitrary(0.01, 0.05));
+    objetos.push(obj1);
+}
+
+var insert = 0;
+for (let count = 0; count < quantRadius.length; count++) {
+    insert = insert + rad;
 }
 
 //Lights
 const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
-directionalLight.position.set(1,1,1);
+directionalLight.position.set(1, 1, 1);
 scene.add(directionalLight);
 
 const pointLight = new THREE.PointLight(0x0000ff, 1000, 5);
 scene.add(pointLight);
 
-//Camera position
 camera.position.z = 20;
-
-var velX = 0
-var velY = 0
 
 var animate = function () {
     requestAnimationFrame(animate);
 
     for (var i in objetos)
         objetos[i].simule();
-
-    camera.position.y += velY
-    camera.position.x += velX
+    objetos[i].hitTarget();
 
     //Light on the astronaut
     pointLight.position.set(astroSphere.position.x, astroSphere.position.y, astroSphere.position.z);
@@ -163,20 +255,22 @@ var animate = function () {
         astroSphere.position.z = astronaut.position.z;
 
         if (astronaut.position.x > limitAstroX || astronaut.position.x < -limitAstroX) {
-            if(astronaut.position.x > 0){
+            if (astronaut.position.x > 0) {
                 astronaut.position.x = astronaut.position.x - 1.5;
             } else {
                 astronaut.position.x = astronaut.position.x + 1.5;
             }
         }
+
         if (astronaut.position.y > limitAstroY || astronaut.position.y < -limitAstroY) {
-            if(astronaut.position.y > 0){
+            if (astronaut.position.y > 0) {
                 astronaut.position.y = astronaut.position.y - 1.5;
             } else {
                 astronaut.position.y = astronaut.position.y + 1.5;
             }
         }
     }
+
     renderer.render(scene, camera);
 }
 
@@ -211,5 +305,7 @@ document.onkeyup = function (e) {
         velX = 0
     }
 }
+
+document.getElementById("playAgain").onclick = function () { change() }
 
 animate();

@@ -28,6 +28,60 @@
 
 <body>
     <script type="module" src="js/mainLevel2.js"></script>
+
+    <dialog>
+      <h2>Game Over!</h2>
+      <h5>There was a collision</h5>
+      <button id="playAgain">Play again</button>
+      <!-- <button id="toClose">To close</button> -->
+    </dialog>
+  
+  </body>
+  
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+  
+    /* Pop-Up */
+    dialog {
+      border: 3px solid black;
+      border-radius: 5px;
+      background: white;
+      box-shadow: 8px 8px 0 rgb(57, 57, 68);
+    }
+  
+    /* Texto do pop-up */
+    h2 {
+      font-family: 'Raleway', sans-serif;
+      letter-spacing: 5px;
+      word-spacing: 10px;
+      text-transform: uppercase;
+      color: black;
+  
+    }
+  
+    #button {
+      font-family: 'Raleway', sans-serif;
+      background: white;
+      padding: 0.8rem 39%;
+      border: 3px solid rgb(57, 57, 68);
+      box-shadow: 0 0 0 rgb(57, 57, 68);
+      transition: all 0.2s;
+    }
+  
+    #button:hover {
+      box-shadow: 0.4rem 0.4rem 0 rgb(57, 57, 68);
+      transform: translate(-0.4rem, -0.4rem);
+    }
+  
+    #button:active{
+      box-shadow: 0 0 0 rgb(57, 57, 68);
+      transform: translate(0, 0);
+    }   
+  
+  </style>
 </body>
 
 </html>
