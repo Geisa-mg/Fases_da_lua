@@ -126,6 +126,7 @@ for (let i = 0; i < m; i++) {
 }
 
 const geometry = new THREE.BufferGeometry().setFromPoints(quantStars);
+geometry.scale(2, 2, 8);
 const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
 const stars = new THREE.Points(geometry, material);
 
@@ -156,10 +157,6 @@ camera.position.z = 20;
 
 var animate = function () {
     requestAnimationFrame(animate);
-    //Rotação das estrelas
-    //geometry.rotateX(0.001);
-    //geometry.rotateY(0.001);
-    geometry.rotateZ(0.001);
 
     //Light on the astronaut
     pointLight.position.set(astroSphere.position.x, astroSphere.position.y, astroSphere.position.z);

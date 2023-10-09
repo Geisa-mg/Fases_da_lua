@@ -1,21 +1,18 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+//Moon variables 
+var angle = 0;
+
 //Astronaut variables
 var accelX = 0.3;
 var accelY = 0.2;
 var limitAstroX = 32.0;
 var limitAstroY = 12.0;
-var velX = 0;
-var velY = 0;
 
 //Randoms
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
-}
-
-function getRandomColor() {
-    return '#' + parseInt((Math.random() * 0xFFFFFF)).toString(16).padStart(6, '0');
 }
 
 function getRandomImages() {
@@ -31,7 +28,7 @@ function openPopup() {
 
 //Change of scene
 function change() {
-    if(document.getElementById("playAgain").onclick){
+    if (document.getElementById("playAgain").onclick) {
         window.location.href = "homePage.html"
     } else {
         //NECESSITA DE VERIFICAÇÃO (tratar depois)
@@ -50,6 +47,14 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+//Creation of the moon and change of material
+const moonGeometry = new THREE.SphereGeometry(2, 60, 60);
+const moonTexture = new THREE.TextureLoader().load("images/moon_map.jpg");
+const moonMaterial = new THREE.MeshPhongMaterial();
+moonMaterial.map = moonTexture;
+const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+scene.add(moon);
+
 //Audio
 const listener = new THREE.AudioListener();
 camera.add(listener);
@@ -62,16 +67,6 @@ audioLoader.load('sounds/universe.ogg', function (buffer) {
     sound.setLoop(true);
     sound.setVolume(0.2);
     sound.play();
-});
-
-const listenerCollision = new THREE.AudioListener();
-camera.add(listenerCollision);
-
-//Sound when collision happens
-const soundCollision = new THREE.Audio(listener);
-const audioLoaderCollision = new THREE.AudioLoader();
-audioLoaderCollision.load('sounds/bomb.mp3', function (bufferCollision) {
-    soundCollision.setBuffer(bufferCollision);
 });
 
 //Creation of the astronaut 3D model
@@ -88,20 +83,6 @@ loader.load('models/cosmonaut.glb', function (gltf) {
     }
 );
 
-//Creation of the explosion 3D model
-var collision;
-const loader2 = new GLTFLoader();
-loader2.load('models/collision.glb', function (gltf) {
-    collision = gltf.scene;
-    collision.scale.set(30, 30, 30)
-    scene.add(gltf.scene);
-    collision.visible = false;
-},
-    undefined, function (error) {
-        console.error(error);
-    }
-);
-
 //Making the sphere for the astronaut 
 const astroGeometry = new THREE.SphereGeometry(3, 7, 3);
 const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: false, opacity: 0.0, wireframe: true });
@@ -109,38 +90,35 @@ const astroSphere = new THREE.Mesh(astroGeometry, astroMaterial);
 scene.add(astroSphere);
 
 //Making the sky with stars
-class sky {
-    limitX = 32.0;
-    limitY = 12.0;
-    limitZ = 1.0;
-    constructor(stars) {
-        this.stars = stars;
+const quantStars = [];
+let n = 100;
+let m = 100;
 
-        //Appear randomly
-        this.stars.position.x = getRandomArbitrary(-this.limitX, this.limitX);
-        this.stars.position.y = getRandomArbitrary(-this.limitY, this.limitY);
-        this.stars.position.z = getRandomArbitrary(-this.limitZ, this.limitZ);
+for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n; j++) {
+        let s = i / (m - 15.0);
+        let t = j / (n - 15.0);
+
+        let x = (Math.random() * 100) * s - 50.0;
+        let y = (Math.random() * 200) * t - 20.0;
+        let z = -5;
+
+        quantStars.push(new THREE.Vector3(x, y, z));
     }
 }
 
-//Creation the stars
-var quantStars = [];
-for (var i = 0; i < 100; i++) {
-    const starGeometry = new THREE.OctahedronGeometry(0.1, 0);
-    var paint = getRandomColor();
-    const starMaterial = new THREE.MeshStandardMaterial({ color: paint, wireframe: false });
-    const star = new THREE.Mesh(starGeometry, starMaterial);
-    scene.add(star);
+const geometry = new THREE.BufferGeometry().setFromPoints(quantStars);
+geometry.scale(2, 2, 8);
+const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const stars = new THREE.Points(geometry, material);
 
-    const stars = new sky(star);
-    quantStars.push(stars)
-}
+scene.add(stars);
 
-//Creation the moons
+//Geisinha aqui
 class simulable {
     limitX = 20;
     limitY = 10;
-    limitZ = 1;
+    limitZ = 20;
     constructor(moonFigures, velZ) {
         this.moonFigures = moonFigures;
         this.velX = 0;
@@ -151,7 +129,7 @@ class simulable {
         this.rotZ = getRandomArbitrary(0.01, 0.02);
         this.moonFigures.position.x = getRandomArbitrary(-this.limitX, this.limitX);
         this.moonFigures.position.y = getRandomArbitrary(-this.limitY, this.limitY);
-        this.moonFigures.position.z = -this.limitZ;
+        this.moonFigures.position.z = this.limitZ;
     }
 
     simule() {
@@ -165,71 +143,45 @@ class simulable {
 
         //Events when collision is detected
         if (astroSphere != null && this.hitTarget()) {
-            soundCollision.setVolume(1.5);
-            soundCollision.play(true);
-            //moonSphere.visible = false;
-            collision.visible = true;
-            astronaut.visible = false;
-            collision.position.set(astronaut.position.x, astronaut.position.y, astronaut.position.z);
-            setTimeout(() => {
-                soundCollision.pause();
-            }, "3500");
+            octah.visible = false;
 
             openPopup();
 
         }
     }
 
+    //Collision
     hitTarget() {
         var deltaX = this.moonFigures.position.x - astroSphere.position.x;
         var deltaY = this.moonFigures.position.y - astroSphere.position.y;
         var deltaZ = this.moonFigures.position.z - astroSphere.position.z;
         var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-        return dist < 2;
-        // var med = insert / 27
-        // if(dist <= med){
-        //     console.log(med)
-        //     return med
-        // } else {
-        //     console.log(1)
-        //     return 1
-        // }
-
-        //return dist < med;
+        return dist < 4;
     }
 }
 
 var objetos = [];
-var quantRadius = [];
 
-for (var i = 0; i < 27; i++) {
-    const geometry = new THREE.SphereGeometry(getRandomArbitrary(0.1, 1), 60, 60);
-    const moonTexture = new THREE.TextureLoader().load("../images/moon" + getRandomImages() + ".jpg");
-    const material = new THREE.MeshBasicMaterial();
-    material.map = moonTexture;
-    const moonSphere = new THREE.Mesh(geometry, material);
-    scene.add(moonSphere);
+for (var i = 0; i < 4; i++) {
+    const geometryOctah = new THREE.OctahedronGeometry(1);
+    const materialOctah = new THREE.MeshBasicMaterial({ color: "Oxb2bec3" });
+    const octah = new THREE.Mesh(geometryOctah, materialOctah);
+    scene.add(octah);
 
-    var rad = moonSphere.geometry.parameters.radius;
-    quantRadius.push(rad);
-    console.log(rad);
-
-    const obj1 = new simulable(moonSphere, getRandomArbitrary(0.01, 0.05));
-    objetos.push(obj1);
-}
-
-var insert = 0;
-for (let count = 0; count < quantRadius.length; count++) {
-    insert = insert + rad;
+    const octahs = new simulable(octah, getRandomArbitrary(0.01, 0.05));
+    objetos.push(octahs);
 }
 
 //Lights
 const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
-directionalLight.position.set(1, 1, 1);
+directionalLight.position.set(-1, 0, 0);
 scene.add(directionalLight);
 
 const pointLight = new THREE.PointLight(0x0000ff, 1000, 5);
 scene.add(pointLight);
+
+const ambientLight = new THREE.AmbientLight(0x0000ff, 0.03);
+scene.add(ambientLight);
 
 camera.position.z = 20;
 
@@ -238,10 +190,14 @@ var animate = function () {
 
     for (var i in objetos)
         objetos[i].simule();
-    objetos[i].hitTarget();
+    // /objetos[i].hitTarget();
 
     //Light on the astronaut
     pointLight.position.set(astroSphere.position.x, astroSphere.position.y, astroSphere.position.z);
+
+    //Starting the moon on the left
+    moon.position.x = -15 * (Math.cos(angle));
+    moon.position.y = 6 * Math.sin(angle);
 
     //Creating a gravity
     if (astronaut) {
