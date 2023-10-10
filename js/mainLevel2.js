@@ -97,7 +97,7 @@ loader.load('models/cosmonaut.glb', function (gltf) {
 
 //Making the sphere for the astronaut 
 const astroGeometry = new THREE.SphereGeometry(3, 7, 3);
-const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: false, opacity: 0.0, wireframe: true });
+const astroMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.0 });
 const astroSphere = new THREE.Mesh(astroGeometry, astroMaterial);
 scene.add(astroSphere);
 
@@ -135,7 +135,7 @@ class simulable {
         this.trashFigures = trashFigures;
         this.velX = 0;
         this.velY = 0;
-        this.velZ = getRandomArbitrary(0.01, 0.05);
+        this.velZ = getRandomArbitrary(0.01, 0.03);
         this.rotX = getRandomArbitrary(0.01, 0.02);
         this.rotY = getRandomArbitrary(0.01, 0.02);
         this.rotZ = getRandomArbitrary(0.01, 0.02);
@@ -159,6 +159,7 @@ class simulable {
             objetos.splice(i, 1);
             if (objetos.length == 17) {
                 openPopup();
+                objetos.length = 0;
             }
         } else if (this.trashFigures.position.z < -20) {
             objetos.splice(i, 1);
