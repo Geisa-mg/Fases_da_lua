@@ -224,6 +224,8 @@ var animate = function () {
 document.onkeydown = function (event) {
     if (event.key == "ArrowRight") {
         angle += vel;
+        console.log(angle)
+
     }
 
     if (event.key == ' ') {

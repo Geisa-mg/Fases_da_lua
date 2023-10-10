@@ -1,12 +1,15 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+//Trash variables
+var cont = 0;
+
 //Moon variables 
 var angle = 0;
 
 //Astronaut variables
-var accelX = 0.3;
-var accelY = 0.2;
+var accelX = 0.5;
+var accelY = 0.3;
 var limitAstroX = 32.0;
 var limitAstroY = 12.0;
 
@@ -15,24 +18,22 @@ function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-function getRandomImages() {
-    return parseInt((Math.random() * 3) + 1);
+//Popup
+const modal = document.querySelector("#loser");
+const modal2 = document.querySelector("#winner");
+
+function openPopupLose() {
+    modal.showModal();
 }
 
-//Popup
-const modal = document.querySelector("dialog");
-
-function openPopup() {
-    modal.showModal();
+function openPopupWin() {
+    modal2.showModal();
 }
 
 //Change of scene
 function change() {
     if (document.getElementById("playAgain").onclick) {
         window.location.href = "homePage.html"
-    } else {
-        //NECESSITA DE VERIFICAÇÃO (tratar depois)
-        modal.close();
     }
 }
 
@@ -114,47 +115,53 @@ const stars = new THREE.Points(geometry, material);
 
 scene.add(stars);
 
-//Geisinha aqui
+//Creation space trash
 class simulable {
     limitX = 20;
     limitY = 10;
     limitZ = 20;
-    constructor(moonFigures, velZ) {
-        this.moonFigures = moonFigures;
+    constructor(trashFigures) {
+        this.trashFigures = trashFigures;
         this.velX = 0;
         this.velY = 0;
-        this.velZ = velZ;
+        this.velZ = getRandomArbitrary(0.01, 0.05);
         this.rotX = getRandomArbitrary(0.01, 0.02);
         this.rotY = getRandomArbitrary(0.01, 0.02);
         this.rotZ = getRandomArbitrary(0.01, 0.02);
-        this.moonFigures.position.x = getRandomArbitrary(-this.limitX, this.limitX);
-        this.moonFigures.position.y = getRandomArbitrary(-this.limitY, this.limitY);
-        this.moonFigures.position.z = this.limitZ;
+        this.trashFigures.position.x = getRandomArbitrary(-this.limitX, this.limitX);
+        this.trashFigures.position.y = getRandomArbitrary(-this.limitY, this.limitY);
+        this.trashFigures.position.z = this.limitZ;
     }
 
-    simule() {
-        this.moonFigures.rotation.x += this.rotX;
-        this.moonFigures.rotation.y += this.rotY;
-        this.moonFigures.rotation.z += this.rotZ;
-        this.moonFigures.position.x += this.velX;
-        this.moonFigures.position.y += this.velY;
-        this.moonFigures.position.z -= this.velZ;
-
+    simule(i) {
+        this.trashFigures.rotation.x += this.rotX;
+        this.trashFigures.rotation.y += this.rotY;
+        this.trashFigures.rotation.z += this.rotZ;
+        this.trashFigures.position.x += this.velX;
+        this.trashFigures.position.y += this.velY;
+        this.trashFigures.position.z -= this.velZ;
 
         //Events when collision is detected
         if (astroSphere != null && this.hitTarget()) {
-            octah.visible = false;
-
-            openPopup();
-
+            this.trashFigures.visible = false;
+            objetos.splice(i, 1);
+            if (objetos.length == 0) {
+                openPopupWin();
+                //ARRRUMAR A VERIFICAÇÃO
+            } else if (this.objetos[i].geometry.position.z < astroSphere.position.z) {
+                this.trashFigures.visible = true;
+                console.log(this.trashFigures.position.z)
+                openPopupLose();
+            }
+            console.log(cont)
         }
     }
 
     //Collision
     hitTarget() {
-        var deltaX = this.moonFigures.position.x - astroSphere.position.x;
-        var deltaY = this.moonFigures.position.y - astroSphere.position.y;
-        var deltaZ = this.moonFigures.position.z - astroSphere.position.z;
+        var deltaX = this.trashFigures.position.x - astroSphere.position.x;
+        var deltaY = this.trashFigures.position.y - astroSphere.position.y;
+        var deltaZ = this.trashFigures.position.z - astroSphere.position.z;
         var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
         return dist < 4;
     }
@@ -162,13 +169,13 @@ class simulable {
 
 var objetos = [];
 
-for (var i = 0; i < 4; i++) {
+for (var i = 0; i < 1; i++) {
     const geometryOctah = new THREE.OctahedronGeometry(1);
-    const materialOctah = new THREE.MeshBasicMaterial({ color: "Oxb2bec3" });
+    const materialOctah = new THREE.MeshBasicMaterial({ color: 0xCCCCCC });
     const octah = new THREE.Mesh(geometryOctah, materialOctah);
     scene.add(octah);
 
-    const octahs = new simulable(octah, getRandomArbitrary(0.01, 0.05));
+    const octahs = new simulable(octah);
     objetos.push(octahs);
 }
 
@@ -187,10 +194,10 @@ camera.position.z = 20;
 
 var animate = function () {
     requestAnimationFrame(animate);
+    cont = objetos.length;
 
     for (var i in objetos)
-        objetos[i].simule();
-    // /objetos[i].hitTarget();
+        objetos[i].simule(i);
 
     //Light on the astronaut
     pointLight.position.set(astroSphere.position.x, astroSphere.position.y, astroSphere.position.z);
@@ -245,22 +252,6 @@ document.onkeydown = function (event) {
     }
     else if (event.key == "ArrowLeft") {
         astronaut.position.x -= accelX;
-    }
-}
-
-document.onkeyup = function (e) {
-    console.log(e)
-    if (e.key == "ArrowUp") {
-        velY = 0
-    }
-    else if (e.key == "ArrowDown") {
-        velY = 0
-    }
-    else if (e.key == "ArrowRight") {
-        velX = 0
-    }
-    else if (e.key == "ArrowLeft") {
-        velX = 0
     }
 }
 
