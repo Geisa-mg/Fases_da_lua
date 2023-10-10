@@ -1,11 +1,9 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-//Trash variables
-var cont = 0;
-
 //Moon variables 
 var angle = 0;
+var dist = 0;
 
 //Astronaut variables
 var accelX = 0.5;
@@ -18,21 +16,34 @@ function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+function getRandomImages() {
+    return parseInt((Math.random() * 4)) + 1;
+}
+
 //Popup
 const modal = document.querySelector("#loser");
 const modal2 = document.querySelector("#winner");
 
-function openPopupLose() {
+function openPopup() {
+    modal2.showModal();
+}
+
+function openPopupLoser() {
     modal.showModal();
 }
 
-function openPopupWin() {
-    modal2.showModal();
+//walk
+function moonPhases() {
+    moon.position.x = 15 * (Math.cos(angle));
+    moon.position.y = 6 * Math.sin(angle);
 }
 
 //Change of scene
 function change() {
     if (document.getElementById("playAgain").onclick) {
+        window.location.href = "homePage.html"
+    }
+    if (document.getElementById("playAgainLoser").onclick) {
         window.location.href = "homePage.html"
     }
 }
@@ -143,17 +154,19 @@ class simulable {
 
         //Events when collision is detected
         if (astroSphere != null && this.hitTarget()) {
+            angle += 0.50;
             this.trashFigures.visible = false;
             objetos.splice(i, 1);
-            if (objetos.length == 0) {
-                openPopupWin();
-                //ARRRUMAR A VERIFICAÇÃO
-            } else if (this.objetos[i].geometry.position.z < astroSphere.position.z) {
-                this.trashFigures.visible = true;
-                console.log(this.trashFigures.position.z)
-                openPopupLose();
+            if (objetos.length == 17) {
+                openPopup();
             }
-            console.log(cont)
+        } else if (this.trashFigures.position.z < -20) {
+            objetos.splice(i, 1);
+            this.trashFigures.visible = false;
+            if (objetos.length < 17) {
+                console.log(objetos.length)
+                openPopupLoser();
+            }
         }
     }
 
@@ -162,16 +175,18 @@ class simulable {
         var deltaX = this.trashFigures.position.x - astroSphere.position.x;
         var deltaY = this.trashFigures.position.y - astroSphere.position.y;
         var deltaZ = this.trashFigures.position.z - astroSphere.position.z;
-        var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+        dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
         return dist < 4;
     }
 }
 
 var objetos = [];
 
-for (var i = 0; i < 1; i++) {
+for (var i = 0; i < 30; i++) {
     const geometryOctah = new THREE.OctahedronGeometry(1);
     const materialOctah = new THREE.MeshBasicMaterial({ color: 0xCCCCCC });
+    const octahTexture = new THREE.TextureLoader().load("images/sheet" + getRandomImages() + ".jpg");
+    materialOctah.map = octahTexture;
     const octah = new THREE.Mesh(geometryOctah, materialOctah);
     scene.add(octah);
 
@@ -194,10 +209,11 @@ camera.position.z = 20;
 
 var animate = function () {
     requestAnimationFrame(animate);
-    cont = objetos.length;
 
     for (var i in objetos)
         objetos[i].simule(i);
+
+    moonPhases();
 
     //Light on the astronaut
     pointLight.position.set(astroSphere.position.x, astroSphere.position.y, astroSphere.position.z);
@@ -256,5 +272,7 @@ document.onkeydown = function (event) {
 }
 
 document.getElementById("playAgain").onclick = function () { change() }
+
+document.getElementById("playAgainLoser").onclick = function () { change() }
 
 animate();

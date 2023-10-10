@@ -117,8 +117,8 @@ for (let i = 0; i < m; i++) {
         let s = i / (m - 15.0);
         let t = j / (n - 15.0);
 
-        let x = (Math.random()*100) * s - 50.0;
-        let y = (Math.random()*200) * t - 20.0;
+        let x = (Math.random() * 100) * s - 50.0;
+        let y = (Math.random() * 200) * t - 20.0;
         let z = -5;
 
         quantStars.push(new THREE.Vector3(x, y, z));
@@ -224,8 +224,6 @@ var animate = function () {
 document.onkeydown = function (event) {
     if (event.key == "ArrowRight") {
         angle += vel;
-        console.log(angle)
-
     }
 
     if (event.key == ' ') {

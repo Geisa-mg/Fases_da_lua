@@ -18,25 +18,26 @@
         </script>
 </head>
 
-<body>
-  <script type="module" src="js/mainLevel2.js"></script>
+<body style="overflow: hidden;">
+  <div>
+    <script type="module" src="js/mainLevel2.js"></script>
 
-  <dialog id="winner">
-    <h2>Congratulations!</h2>
-    <h5>You won</h5>
-    <button id="playAgain">Play again</button>
-  </dialog>
+    <dialog id="winner">
+      <h2>Congratulations!</h2>
+      <h5>You won</h5>
+      <button id="playAgain">Play again</button>
+    </dialog>
+  </div>
 
-</body>
-<script type="module" src="js/mainLevel2.js"></script>
+  <div>
+    <script type="module" src="js/mainLevel2.js"></script>
 
-<dialog id="loser">
-  <h2>Game Over!</h2>
-  <h5>There was a collision</h5>
-  <button id="playAgain">Play again</button>
-</dialog>
-
-<body>
+    <dialog id="loser">
+      <h2>Game Over!</h2>
+      <h5>There was a collision</h5>
+      <button id="playAgainLoser">Play again</button>
+    </dialog>
+  </div>
 
 </body>
 
@@ -46,7 +47,8 @@
     overflow: hidden;
   }
 
-  dialog {
+  #loser,
+  #winner {
     border: 3px solid black;
     border-radius: 5px;
     background: white;
@@ -68,26 +70,25 @@
     letter-spacing: 5px;
     word-spacing: 10px;
     color: black;
+    text-align: center;
+    justify-content: center;
   }
 
-  #playAgain,
-  #toClose {
+  #playAgain, #playAgainLoser {
     font-family: 'Raleway', sans-serif;
     background: white;
-    padding: 0.8rem 12%;
+    padding: 0.8rem 35%;
     border: 3px solid rgb(57, 57, 68);
     box-shadow: 0 0 0 rgb(57, 57, 68);
     transition: all 0.2s;
   }
 
-  #playAgain:hover,
-  #toClose:hover {
+  #playAgain:hover, #playAgainLoser:hover {
     box-shadow: 0.4rem 0.4rem 0 rgb(57, 57, 68);
     transform: translate(-0.4rem, -0.4rem);
   }
 
-  #playAgain:active,
-  #toClose:active {
+  #playAgain:active, #playAgainLoser:hover {
     box-shadow: 0 0 0 rgb(57, 57, 68);
     transform: translate(0, 0);
   }
