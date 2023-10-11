@@ -34,8 +34,8 @@ function openPopupLoser() {
 
 //walk
 function moonPhases() {
-    moon.position.x = 15 * (Math.cos(angle));
-    moon.position.y = 6 * Math.sin(angle);
+    moon.position.x = 16 * (Math.cos(angle));
+    moon.position.y = 7 * Math.sin(angle);
 }
 
 //Change of scene
@@ -135,7 +135,7 @@ class simulable {
         this.trashFigures = trashFigures;
         this.velX = 0;
         this.velY = 0;
-        this.velZ = getRandomArbitrary(0.01, 0.03);
+        this.velZ = getRandomArbitrary(0.01, 0.02);
         this.rotX = getRandomArbitrary(0.01, 0.02);
         this.rotY = getRandomArbitrary(0.01, 0.02);
         this.rotZ = getRandomArbitrary(0.01, 0.02);
@@ -161,11 +161,10 @@ class simulable {
                 openPopup();
                 objetos.length = 0;
             }
-        } else if (this.trashFigures.position.z < -20) {
+        } else if (this.trashFigures.position.z < -22) {
             objetos.splice(i, 1);
             this.trashFigures.visible = false;
             if (objetos.length < 17) {
-                console.log(objetos.length)
                 openPopupLoser();
             }
         }
